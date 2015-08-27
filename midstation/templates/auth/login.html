@@ -1,24 +1,21 @@
-{% set page_title = _("Login") %}
+{% extends "layout.html" %}
 
-{% extends theme("layout.html") %}
-{% from theme("macros.html") import horizontal_field %}
 {% block content %}
 
-<form class="form-horizontal" role="form" method="POST">
-    <h2>{% trans %}Login{% endtrans %}</h2>
-    <hr>
-    {{ form.hidden_tag() }}
-    {{ horizontal_field(form.login)}}
-    {{ horizontal_field(form.password)}}
-    {{ horizontal_field(form.remember_me) }}
-    {{ horizontal_field(form.submit) }}
+<h1>Sign In</h1>
 
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-4">
-            <a class="pull-left" href="{{ url_for('auth.register') }}"><small>{% trans %}Not a member yet?{% endtrans %}</small></a>
-            <a class="pull-right" href="{{ url_for('auth.forgot_password') }}"><small>{% trans %}Forgot Password?{% endtrans %}</small></a>
-        </div>
-    </div>
+<form action="" method="post" name="login">
+    {{form.hidden_tag()}}
+    <p>
+        Please enter your user name:<br>
+        {{form.username(size=80)}}<br>
+    </p>
+    <p>
+        Please enter your password:<br>
+        {{form.password(size=80)}}<br>
+    </p>
+    <p>{{form.remember_me}} Remember Me</p>
+    <p>{{form.submit}}</p>
+    <!--<p><input type="submit" value="Sign In"></p>-->
 </form>
-
 {% endblock %}

@@ -1,25 +1,10 @@
-{% set page_title = _("Register") %}
-
-{% extends theme("layout.html") %}
+{% extends "layout.html"%}
 {% block content %}
-{% from theme("macros.html") import horizontal_field %}
-
-<form class="form-horizontal" role="form" method="POST">
-    <h2>{% trans %}Register{% endtrans %}</h2>
-    <hr>
-    {{ form.hidden_tag() }}
-    {{ horizontal_field(form.username)}}
-    {{ horizontal_field(form.email)}}
-    {{ horizontal_field(form.password)}}
-    {{ horizontal_field(form.confirm_password)}}
-
-    {% if config["RECAPTCHA_ENABLED"] %}
-        {{ horizontal_field(form.recaptcha) }}
-    {% endif %}
-
-    {{ horizontal_field(form.accept_tos)}}
-    {{ horizontal_field(form.submit)}}
-
+<form class="sign-up">
+    <h1 class="sign-up-title">Sign up in seconds</h1>
+    <input type="text" class="sign-up-input" placeholder="What's your username?" autofocus>
+    <input type="password" class="sign-up-input" placeholder="Choose a password">
+    <input type="submit" value="Sign me up!" class="sign-up-button">
 </form>
 
 {% endblock %}

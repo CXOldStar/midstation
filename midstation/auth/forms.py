@@ -14,10 +14,9 @@ from flask_wtf import Form, RecaptchaField
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
-                                regexp, ValidationError)
+                                regexp, ValidationError, Length)
 from flask_babelex import lazy_gettext as _
-
-from flaskbb.user.models import User
+from midstation.user.models import User
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
@@ -25,91 +24,23 @@ is_username = regexp(USERNAME_RE,
 
 
 class LoginForm(Form):
-    login = StringField(_("Username or E-Mail Address"), validators=[
-        DataRequired(message=_("A Username or E-Mail Address is required."))]
-    )
+    username = StringField(u'用户名', [Length(min=4, max=25)])
+    password = PasswordField(u'密码', [Length(min=6, max=25)])
+    remember_me = BooleanField(u'记住我', default=False)
 
-    password = PasswordField(_("Password"), validators=[
-        DataRequired(message=_("A Password is required."))])
+    submit = SubmitField(u'登陆')
 
-    remember_me = BooleanField(_("Remember Me"), default=False)
+    def auth(self):
+        users = User.query.filter_by(username=self.username.data).all()
+        for user in users:
+            if user.id == self.password.data:
+                return True
 
-    submit = SubmitField(_("Login"))
-
-
-class RegisterForm(Form):
-    username = StringField(_("Username"), validators=[
-        DataRequired(message=_("A Username is required.")),
-        is_username])
-
-    email = StringField(_("E-Mail Address"), validators=[
-        DataRequired(message=_("A E-Mail Address is required.")),
-        Email(message=_("Invalid E-Mail Address."))])
-
-    password = PasswordField(_('Password'), validators=[
-        InputRequired(),
-        EqualTo('confirm_password', message=_('Passwords must match.'))])
-
-    confirm_password = PasswordField(_('Confirm Password'))
-
-    accept_tos = BooleanField(_("I accept the Terms of Service"), default=True)
-
-    submit = SubmitField(_("Register"))
-
-    def validate_username(self, field):
-        user = User.query.filter_by(username=field.data).first()
-        if user:
-            raise ValidationError(_("This Username is already taken."))
-
-    def validate_email(self, field):
-        email = User.query.filter_by(email=field.data).first()
-        if email:
-            raise ValidationError(_("This E-Mail Address is already taken."))
-
-    def save(self):
-        user = User(username=self.username.data,
-                    email=self.email.data,
-                    password=self.password.data,
-                    date_joined=datetime.utcnow(),
-                    primary_group_id=4)
-        return user.save()
+        return False
 
 
-class RegisterRecaptchaForm(RegisterForm):
-    recaptcha = RecaptchaField(_("Captcha"))
-
-
-class ReauthForm(Form):
-    password = PasswordField(_('Password'), valdidators=[
-        DataRequired(message=_("A Password is required."))])
-
-    submit = SubmitField(_("Refresh Login"))
-
-
-class ForgotPasswordForm(Form):
-    email = StringField(_('E-Mail Address'), validators=[
-        DataRequired(message=_("A E-Mail Address is reguired.")),
-        Email()])
-
-    submit = SubmitField(_("Request Password"))
-
-
-class ResetPasswordForm(Form):
-    token = HiddenField('Token')
-
-    email = StringField(_('E-Mail Address'), validators=[
-        DataRequired(message=_("A E-Mail Address is required.")),
-        Email()])
-
-    password = PasswordField(_('Password'), validators=[
-        InputRequired(),
-        EqualTo('confirm_password', message=_('Passwords must match.'))])
-
-    confirm_password = PasswordField(_('Confirm Password'))
-
-    submit = SubmitField(_("Reset Password"))
-
-    def validate_email(self, field):
-        email = User.query.filter_by(email=field.data).first()
-        if not email:
-            raise ValidationError(_("Wrong E-Mail Address."))
+# class LoginForm(Form):
+#     username = StringField('username', validators=[InputRequired()])
+#     password = PasswordField('password', validators=[Length(min=6, max=20)])
+#     remember_me = BooleanField(u'记住我', default=False)
+#     submit = SubmitField(u'登陆')

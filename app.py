@@ -4,7 +4,7 @@ __author__ = 'qitian'
 from flask import Flask
 from flask import render_template
 
-from midstation.auth import auth
+from midstation.auth.views import auth
 
 
 def create_app(config=None):
@@ -14,14 +14,16 @@ def create_app(config=None):
     app = Flask(__name__)
 
     # Use the default config and override it afterwards
-    app.config.from_object('configs.default.DefaultConfig')
+    # app.config.from_object('midstation.configs.default.DefaultConfig')
     # Update the config
-    app.config.from_object(config)
+    # app.config.from_object(config)
     # try to update the config via the environment variable
-    app.config.from_envvar("FLASK-TEST_SETTINGS", silent=True)
+    # app.config.from_envvar("FLASK-TEST_SETTINGS", silent=True)
 
-
-    configure_blueprint(app)
+    # configure_blueprint(app)
+    @app.route('/')
+    def index():
+        return 'index'
 
     return app
 
@@ -47,10 +49,10 @@ def configure_errorhandlers(app):
     def server_error_page(error):
         return render_template("errors/server_error.html"), 500
 
-
-
+from flask import Flask
+app = Flask(__name__)
 
 
 if __name__ == '__main__':
-    app = create_app()
+    app.debug = True
     app.run()
