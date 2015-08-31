@@ -20,7 +20,7 @@ class DefaultConfig(object):
     _basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
                             os.path.dirname(__file__)))))
 
-    DEBUG = False
+    DEBUG = True
     TESTING = False
 
     # Logs
@@ -85,8 +85,8 @@ class DefaultConfig(object):
     REDIS_DATABASE = 0
 
     # URL Prefixes
-    STATION_URL_PREFIX = ""
+    STATION_URL_PREFIX = "/station"
     USER_URL_PREFIX = "/user"
-    MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
+    WECHAT_URL_PREFIX = "/wechat"

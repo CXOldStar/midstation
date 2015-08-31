@@ -4,6 +4,7 @@ __author__ = 'qitian'
 from midstation.extensions import db
 from datetime import datetime
 
+BUTTONS_PER_PAGE = 15
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -75,6 +76,14 @@ class User(db.Model):
         """
         db.session.delete(self)
         db.session.commit()
+
+
+    def all_buttons(self, page=1):
+        """Returns a paginated result with all topics the user has created."""
+
+        return Button.query.filter(Button.user_id == self.id).\
+            order_by(Button.node_id.desc()).limit(page * BUTTONS_PER_PAGE).all()
+
 
 
 class Button(db.Model):
@@ -238,7 +247,7 @@ class Order(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def save(self, button=None):
+    def save(self, button=None, create_time=None):
         """
         Saves an order and return an order object
         :param button:
@@ -252,6 +261,9 @@ class Order(db.Model):
             self.button_id = button.id
             self.user_id = button.user.id
             self.service_id = button.service.id
+            if create_time:
+                self.create_time = create_time
+
             db.session.add(self)
             db.session.commit()
         return self

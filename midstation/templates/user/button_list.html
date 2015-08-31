@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h1>Buttons</h1>
+    <div class="table-responsive">
+        <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Node ID</th>
+            <th>Service</th>
+            <th>Customer</th>
+            <th>Address</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for button in buttons %}
+        <tr>
+            <td><a href="{{ url_for('user.button_profile', node_id=button.node_id) }}">{{ button.node_id }}</a></td>
+            <td>{{ button.service.name }}</td>
+            <td>中文</td>
+            <td></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+    </table>
+    </div>
+
+{% endblock %}

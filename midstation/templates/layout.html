@@ -25,6 +25,10 @@
 </head>
 <body>
 
+    {% block navigation %}
+        {% include 'navigation.html' %}
+    {% endblock %}
+
     <div class="container">
 
         {% block content %}

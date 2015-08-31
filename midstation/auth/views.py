@@ -19,12 +19,6 @@ from midstation.auth.forms import LoginForm
 auth = Blueprint('auth', __name__, template_folder='templates')
 
 
-@auth.route('/')
-def hello():
-    try:
-        return render_template("layout.html")
-    except TemplateNotFound:
-        abort(404)
 
 @auth.route('/auth/register')
 def register():
@@ -44,12 +38,16 @@ def register():
 #     print hello
 #     return render_template("auth/login.html", form=form)
 
+@auth.route('/')
 @auth.route("/auth/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         flash('Login requested for OpenID="' + form.username.data + '", remember_me=' +str(form.remember_me.data))
-        return redirect('/auth/register')
+        name = form.username.data
+        password = form.password.data
+        return redirect('/station/button_list.html')
+        # return redirect('/auth/register')
     return render_template('auth/login.html',
         title='Sign In',
         form=form)
