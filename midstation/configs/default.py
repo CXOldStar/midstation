@@ -90,3 +90,6 @@ class DefaultConfig(object):
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
     WECHAT_URL_PREFIX = "/wechat"
+
+    # Wechat Token
+    WECHAT_TOKEN = 'midstation'

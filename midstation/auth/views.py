@@ -14,10 +14,30 @@ from flask import render_template
 from jinja2 import TemplateNotFound
 from flask import abort
 from midstation.auth.forms import LoginForm
-
+from wechat_sdk import WechatBasic
 
 auth = Blueprint('auth', __name__, template_folder='templates')
 
+
+@auth.route('/')
+def wechat_token():
+
+    args = request.args
+    token = 'midstation'
+    echostr = args['echostr']
+
+    signature = args['signature']
+    timestamp = args['timestamp']
+    nonce = args['nonce']
+
+
+    # 实例化 wechat
+    wechat = WechatBasic(token=token)
+    # 对签名进行校验
+    if wechat.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
+        return echostr
+
+    return 'auth token fail'
 
 
 @auth.route('/auth/register')
@@ -38,7 +58,7 @@ def register():
 #     print hello
 #     return render_template("auth/login.html", form=form)
 
-@auth.route('/')
+
 @auth.route("/auth/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()

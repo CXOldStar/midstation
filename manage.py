@@ -22,9 +22,7 @@ from __future__ import print_function
 import sys
 import os
 import subprocess
-import requests
 
-from flask import current_app
 from werkzeug.utils import import_string
 from sqlalchemy.exc import IntegrityError, OperationalError
 from flask_script import (Manager, Shell, Server, prompt, prompt_pass,
