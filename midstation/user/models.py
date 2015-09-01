@@ -275,6 +275,12 @@ class Order(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+def create_order(node_id):
+    order = Order()
+    button = Button.query.filter_by(node_id=node_id).first()
+
+    order.save(button=button)
+
 
 if __name__ == '__main__':
     # db.drop_all()

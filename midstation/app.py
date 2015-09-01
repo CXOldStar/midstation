@@ -7,9 +7,17 @@ from midstation.station.views import station
 from midstation.user.views import user
 from threading import Thread
 from midstation.wechat.views import wechat
+import time
+from midstation.utils.scrape_backend import detect_button_events
+
 
 def create_app(config=None):
     """Creates the app."""
+
+    # 探测按钮消息后台线程
+    t = Thread(target=detect_button_events)
+    t.setDaemon(True)
+    t.start()
 
     # Initialize the app
     app = Flask(__name__)
@@ -30,7 +38,7 @@ def configure_blueprint(app):
     app.register_blueprint(auth)
     app.register_blueprint(station, url_prefix=app.config['STATION_URL_PREFIX'])
     app.register_blueprint(user, url_prefix=app.config['USER_URL_PREFIX'])
-    app.register_blueprint(wechat, url_prefix=app.config['WECHAT_URL_PREFIX'])
+    # app.register_blueprint(wechat, url_prefix=app.config['WECHAT_URL_PREFIX'])
 
 
 def configure_extensions(app):

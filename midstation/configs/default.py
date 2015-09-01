@@ -91,5 +91,13 @@ class DefaultConfig(object):
     ADMIN_URL_PREFIX = "/admin"
     WECHAT_URL_PREFIX = "/wechat"
 
-    # Wechat Token
+    # Smart Button
+    GATEWAY_ID = 'a2d790e1-1670-1217-0000-000db93db700'
+    ORGANIZATION = 'niot'
+    LINKLAB_USERNAME = 'niot.user'
+    LINKLAB_PASSWORD = 'Ni0t!0715'
+
+    # Wechat
     WECHAT_TOKEN = 'midstation'
+    WECHAT_APPID = 'wx6b84ff9cb6f9a54e'
+    WECHAT_APPSECRET = '4e09e5b35198bdbf35b90a65d5f76af4'
