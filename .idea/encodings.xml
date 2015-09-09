@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/midstation/static/js/base64.js" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/midstation/static/js/md5.js" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/midstation/static/js/sha1.js" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/midstation/templates/flashed_messages.html" charset="GBK" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

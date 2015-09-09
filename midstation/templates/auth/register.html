@@ -1,10 +1,36 @@
-{% extends "layout.html"%}
-{% block content %}
-<form class="sign-up">
-    <h1 class="sign-up-title">Sign up in seconds</h1>
-    <input type="text" class="sign-up-input" placeholder="What's your username?" autofocus>
-    <input type="password" class="sign-up-input" placeholder="Choose a password">
-    <input type="submit" value="Sign me up!" class="sign-up-button">
-</form>
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6 ielt8"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="ie7 ielt8"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title> {{ title }}</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}" />
+</head>
+<body>
+<div class="container">
+	<section id="content">
 
-{% endblock %}
+		<form action="" method="POST">
+
+            {{ form.csrf_token }}
+			<h1>Login Form</h1>
+			<div>
+				{{ form.username(placeholder=form.username.label.text) }}
+			</div>
+			<div>
+				{{ form.password(placeholder=form.password.label.text) }}
+			</div>
+            <div>
+				{{ form.confirm_password(placeholder=form.confirm_password.label.text) }}
+			</div>
+			<div>
+				{{ form.submit(placeholder=form.submit.label.text) }}
+				<a href="{{ url_for('auth.login') }}">登陆</a>
+			</div>
+		</form><!-- form -->
+	</section><!-- content -->
+</div><!-- container -->
+</body>
+</html>

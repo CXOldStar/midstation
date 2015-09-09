@@ -9,7 +9,8 @@ from threading import Thread
 from midstation.wechat.views import wechat
 import time
 from midstation.utils.scrape_backend import detect_button_events
-
+from extensions import login_manager
+from midstation.user.models import User
 
 def create_app(config=None):
     """Creates the app."""
@@ -28,10 +29,13 @@ def create_app(config=None):
     app.config.from_object(config)
 
     configure_blueprint(app)
-
+    configure_extensions(app)
     # configure_extensions(app)
     app.debug = app.config['DEBUG']
     return app
+
+
+
 
 
 def configure_blueprint(app):
@@ -42,10 +46,19 @@ def configure_blueprint(app):
 
 
 def configure_extensions(app):
+    login_configure(app)
 
-    # Flask-Themes
-    # themes.init_themes(app, app_identifier="midstation")
-    pass
+
+def login_configure(app):
+    login_manager.init_app(app)
+    login_manager.login_view = app.config['LOGIN_VIEW']
+    @login_manager.user_loader
+    def load_user(user_id):
+        user_instance = User.query.filter_by(id=user_id).first()
+        if user_instance:
+            return user_instance
+        else:
+            return None
 
 
 def run_app():

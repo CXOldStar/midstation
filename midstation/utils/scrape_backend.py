@@ -32,7 +32,6 @@ def detect_button_events(interval=5):
     try:
         while True:
             data = get_received_messages(ORGANIZATION, GATEWAY_ID, USERNAME, PASSWORD, NUM_MINUTES_BACK)
-            #TODO: 验证是否未处理过的数据，若是发送微信，录入数据表
             if data:
                 for d in data['events']:
                     eventUUID = d['routerMetadata']['eventUUID']

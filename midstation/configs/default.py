@@ -101,3 +101,6 @@ class DefaultConfig(object):
     WECHAT_TOKEN = 'midstation'
     WECHAT_APPID = 'wx6b84ff9cb6f9a54e'
     WECHAT_APPSECRET = '4e09e5b35198bdbf35b90a65d5f76af4'
+
+    # Auth
+    LOGIN_VIEW = "auth.login"

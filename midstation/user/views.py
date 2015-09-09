@@ -5,10 +5,13 @@ from flask import Blueprint, request, render_template, abort, redirect, url_for
 from jinja2 import TemplateNotFound
 from midstation.user.models import User
 from midstation.user.models import Button
+from flask_login import login_required
+
 user = Blueprint('user', __name__, template_folder='templates')
 
 
 @user.route('/button_list')
+@login_required
 def button_list():
     try:
         #get buttons
@@ -32,3 +35,4 @@ def get_buttons(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
         return user.all_buttons(page=1)
+
