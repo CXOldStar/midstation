@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-
+    
     <h1>Buttons</h1>
     <div class="table-responsive">
         <table class="table table-hover">
@@ -24,6 +24,9 @@
     </tbody>
 
     </table>
+    </div>
+    <div class="row">
+        <a href="{{ url_for('user.button_profile', node_id=0) }}" class=""><button class="btn btn-primary">添加按钮</button></a>
     </div>
 
 {% endblock %}

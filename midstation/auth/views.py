@@ -80,3 +80,8 @@ def login():
     return render_template('auth/login.html',
         title='Sign In',
         form=form)
+
+@auth.route('/auth/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('auth.login'))

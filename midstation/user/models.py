@@ -18,6 +18,7 @@ class User(db.Model):
     wechat_id = db.Column(db.String(200), unique=True)
     telephone = db.Column(db.String(15), unique=True)
     mobile_phone = db.Column(db.String(15), unique=True)
+    address = db.Column(db.String(200))
 
     # One-to-many
     buttons = db.relationship("Button", backref="user",
@@ -137,8 +138,9 @@ class User(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(self, user_id):
-        return User.query.filter_by(id=user_id)
+    @classmethod
+    def get_user_by_id(self, user_id):
+        return User.query.filter_by(id=user_id).first()
 
     def all_buttons(self, page=1):
         """Returns a paginated result with all topics the user has created."""
@@ -161,8 +163,6 @@ class Button(db.Model):
                              primaryjoin="Order.button_id == Button.id"
                              )
 
-    def __init__(self, node_id):
-        self.node_id = node_id
 
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
@@ -207,7 +207,7 @@ class Service(db.Model):
     count = db.Column(db.Integer, default=1)                                                    # 数量
     unit = db.Column(db.String(6), default=u'桶')                                                # 单位
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
+    price = db.Column(db.DECIMAL)
     # One-to-Many
     buttons = db.relationship('Button', backref='service',
                               primaryjoin='Button.service_id == Service.id')
@@ -216,8 +216,6 @@ class Service(db.Model):
     orders = db.relationship('Order', backref='service',
                              primaryjoin='Order.service_id == Service.id')
 
-    def __init__(self, name):
-        self.name = name
 
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
@@ -244,6 +242,9 @@ class Service(db.Model):
         """
         db.session.delete(self)
         db.session.commit()
+
+    def get_services(self, user):
+        return user.services
 
 
 class Customer(db.Model):

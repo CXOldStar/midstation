@@ -8,6 +8,8 @@ html {
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
+    font-family: "Hiragino Sans GB", "Microsoft YaHei",
+             "WenQuanYi Micro Hei", sans-serif, Georgia, sans-serif;
 }
 
 #footer {
@@ -503,3 +505,8 @@ input {
   border: 0;
   padding: 0;
 }
+
+.left {text-align: left ! important;}
+.center {text-align: center ! important;}
+.right {text-align: right ! important;}
+

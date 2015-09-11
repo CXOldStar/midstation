@@ -11,6 +11,7 @@ import time
 from midstation.utils.scrape_backend import detect_button_events
 from extensions import login_manager
 from midstation.user.models import User
+from midstation.service.views import service
 
 def create_app(config=None):
     """Creates the app."""
@@ -42,6 +43,7 @@ def configure_blueprint(app):
     app.register_blueprint(auth)
     app.register_blueprint(station, url_prefix=app.config['STATION_URL_PREFIX'])
     app.register_blueprint(user, url_prefix=app.config['USER_URL_PREFIX'])
+    app.register_blueprint(service, url_prefix=app.config['SERVICE_URL_PREFIX'])
     # app.register_blueprint(wechat, url_prefix=app.config['WECHAT_URL_PREFIX'])
 
 

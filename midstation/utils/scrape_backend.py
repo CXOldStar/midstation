@@ -111,7 +111,10 @@ def validate_hex_payload(x):
 def get_received_messages(organization, gateway_id, username, password, num_minutes_back):
     url = build_url(organization, gateway_id, num_minutes_back)
     auth = requests.auth.HTTPBasicAuth(username, password)
-    resp = requests.get(url, verify=False, auth=auth)
+    try:
+        resp = requests.get(url, verify=False, auth=auth)
+    except Exception:
+        resp = requests.get(url, verify=False, auth=auth)
 
     if resp.status_code != requests.codes['ok']:
         raise RuntimeError(resp.reason)
