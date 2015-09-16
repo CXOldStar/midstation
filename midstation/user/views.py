@@ -8,6 +8,8 @@ from midstation.user.models import Button
 from flask_login import login_required, current_user
 from midstation.user.forms import UserInfoForm
 from midstation.button.forms import ButtonForm
+from midstation.user.models import Service, Customer
+from midstation.utils.tools import get_service_choice, get_customer_choice
 
 user = Blueprint('user', __name__, template_folder='templates')
 
@@ -17,8 +19,7 @@ user = Blueprint('user', __name__, template_folder='templates')
 def button_list():
     try:
         #get buttons
-        buttons = get_buttons(1)
-        print buttons
+        buttons = get_buttons(current_user.id)
         return render_template("user/button_list.html", buttons=buttons)
     except TemplateNotFound:
         abort(404)
@@ -28,7 +29,7 @@ def button_list():
 @user.route('/button/<node_id>', methods=['GET', 'POST'])
 @login_required
 def button_profile(node_id):
-    if node_id == 0:
+    if node_id == '0':
         button = Button()
     else:
         button = Button.query.filter_by(node_id=node_id).first()
@@ -37,8 +38,20 @@ def button_profile(node_id):
         redirect(url_for('user.button_list'))
         flash(u'不存在该按钮', category='error')
     try:
-        form = ButtonForm(request.form)
-        return render_template('user/button_profile.html', button=button, form=form)
+        form = ButtonForm(request.form, service=getattr(button, 'service_id', None), customer=getattr(button, 'customer_id',None))
+        if current_user:
+            form.service.choices = get_service_choice()
+            form.customer.choices = get_customer_choice()
+
+
+            if request.method == 'POST' and form.validate_on_submit():
+                print form.service.data
+                print form.customer.data
+                form.save_form(button)
+                return redirect(url_for('user.button_list'))
+
+
+        return render_template('user/button_profile.html',button=button, form=form)
     except TemplateNotFound:
         abort(404)
 
@@ -52,7 +65,7 @@ def user_profile():
             form.save_form()
             flash(u'保存成功', category='success')
     # return render_template('user/test_jquery.html', user=current_user, form=form)
-    return render_template('user/user_profile.html', user=current_user, form=form)
+    return render_template('user/user_profile.html',  form=form)
 
 
 def get_buttons(user_id):

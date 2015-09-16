@@ -19,5 +19,7 @@ def create_salt():
         salt += chars[random.randint(0, len_chars)]
     return salt
 
+
+
 if __name__ == '__main__':
     print create_salt()

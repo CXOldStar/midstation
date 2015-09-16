@@ -36,9 +36,6 @@ def create_app(config=None):
     return app
 
 
-
-
-
 def configure_blueprint(app):
     app.register_blueprint(auth)
     app.register_blueprint(station, url_prefix=app.config['STATION_URL_PREFIX'])

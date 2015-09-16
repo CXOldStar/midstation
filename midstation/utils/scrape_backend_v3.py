@@ -69,7 +69,7 @@ def detect_button_events(interval=5):
                             # 创建订单
                             create_order(node_id)
                             # TODO:发送确认消息
-                            send_command(USERNAME, PASSWORD, GATEWAY_ID, node_id, '0XFF')
+                            # send_command(USERNAME, PASSWORD, GATEWAY_ID, node_id, '0XFF')
 
             time.sleep(interval)
 
