@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
-__author__ = 'qitian'
+'''
+日期：20150908
+功能：打印所有基站最新的一条消息。可以通过修改gateway_mac来增加基站。
+特点：利用map()实现并发。
+'''
+import requests
+import json
+import datetime
+import sys
+from functools import partial
+import time
+import pprint
 import datetime
 import time
 import os
@@ -11,13 +22,16 @@ from wechat_sdk import WechatBasic
 from midstation.user.models import Order, create_order
 import requests
 
-requests.packages.urllib3.disable_warnings()
 
-GATEWAY_ID = Config.GATEWAY_ID
-ORGANIZATION = Config.ORGANIZATION
-USERNAME = Config.LINKLAB_USERNAME
-PASSWORD = Config.LINKLAB_PASSWORD
+gateway_mac = ["000db93db79c", "000db93db700", "000db93db804", "000db93db7c0", "000db93db6f8", '000db93db784']
+GATEWAY_ID = ["a2d790e1-1670-1217-0000-" + mac for mac in gateway_mac]
+
+ORGANIZATION = "niot"
+USERNAME = "niot.user"
+PASSWORD = "Ni0t!0715"
+
 NUM_MINUTES_BACK = 1
+
 
 def detect_button_events(interval=5):
     """
@@ -31,35 +45,36 @@ def detect_button_events(interval=5):
 
     try:
         while True:
-            data = get_received_messages(ORGANIZATION, GATEWAY_ID, USERNAME, PASSWORD, NUM_MINUTES_BACK)
+            data = get_received_messages(ORGANIZATION, GATEWAY_ID, USERNAME, PASSWORD, 2*60)
             if data:
-                for d in data['events']:
-                    eventUUID = d['routerMetadata']['eventUUID']
-                    node_id = d['networkMessage']['nodeMetadata']['nodeId']
-                    receipt_time = d['routerMetadata']['receiptTime']
+                for event in data:
+                    datas = event["events"]
+                    for d in event['events']:
+                        eventUUID = d['networkMessage']['routerMetadata']['eventUUID']
+                        node_id = d['networkMessage']['nodeMetadata']['nodeId']
+                        receipt_time = d['networkMessage']['routerMetadata']['receiptTime']
 
-                    # change to datatime object
-                    receipt_time = receipt_time[:8] + receipt_time[9:15]
-                    receipt_time = datetime.datetime.strptime(receipt_time, '%Y%m%d%H%M%S')
+                        # change to datatime object
+                        receipt_time = receipt_time[:8] + receipt_time[9:15]
+                        receipt_time = datetime.datetime.strptime(receipt_time, '%Y%m%d%H%M%S')
 
-                    # 判断是否已经处理过了
-                    msg = Message.query.filter_by(eventUUID=eventUUID).first()
-                    if not msg:
-                        message = Message(eventUUID=eventUUID, node_id=node_id, receipt_time=receipt_time)
-                        message.save()
+                        # 判断是否已经处理过了
+                        msg = Message.query.filter_by(eventUUID=eventUUID).first()
+                        if not msg:
+                            message = Message(eventUUID=eventUUID, node_id=node_id, receipt_time=receipt_time)
+                            message.save()
 
-                        # 发送微信消息
-                        send_wechat(node_id)
-                        # 创建订单
-                        create_order(node_id)
-                        # 发送确认消息
-                        send_command(USERNAME, PASSWORD, GATEWAY_ID, node_id, '0XFF')
+                            # 发送微信消息
+                            send_wechat(node_id)
+                            # 创建订单
+                            create_order(node_id)
+                            # TODO:发送确认消息
+                            send_command(USERNAME, PASSWORD, GATEWAY_ID, node_id, '0XFF')
 
             time.sleep(interval)
 
     except KeyboardInterrupt:
         os.exit()
-
 
 # 发送微信消息
 def send_wechat(node_id):
@@ -102,33 +117,31 @@ def send_command(username, password, target_gateway_id, target_node_id, payload_
         raise RuntimeError(response.reason)
 
 
-def validate_hex_payload(x):
-    hex(int(x, 16))
-    return x
-
 
 def get_received_messages(organization, gateway_id, username, password, num_minutes_back):
-    url = build_url(organization, gateway_id, num_minutes_back)
+    urls = build_urls(organization, gateway_id, num_minutes_back)
     auth = requests.auth.HTTPBasicAuth(username, password)
-    try:
-        resp = requests.get(url, verify=False, auth=auth)
-    except Exception:
-        resp = requests.get(url, verify=False, auth=auth)
+    data = []
 
-    if resp.status_code != requests.codes['ok']:
-        raise RuntimeError(resp.reason)
+    req_get = partial(requests.get, verify=False, auth=auth)
+    resp = map(req_get, urls)
 
-    return json.loads(resp.content.decode())
+    for i in resp:
+        if i.status_code == requests.codes['ok']:
+            data.append(json.loads(i.content.decode()))
+
+    return data
 
 
-def build_url(organization, gateway_id, num_minutes_back):
+def build_urls(organization, gateway_id, num_minutes_back):
     url_base = 'https://dataaccess.link-labs.com/data/dataFlow/' + organization + '/gateway/'
     curr_time = get_current_time()
-    return url_base + gateway_id + '/events/timeRange?refTime=' +\
-        curr_time + '&minsBack=' + str(num_minutes_back)
+    return [(url_base + ident + '/events/timeRange?refTime=' +\
+        curr_time + '&minsBack=' + str(num_minutes_back)) for ident in gateway_id]
 
 
 def get_current_time():
     return datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S.%f')[:-3]
 
-
+if __name__ == "__main__":
+    pass

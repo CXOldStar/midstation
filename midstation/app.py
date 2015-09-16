@@ -8,7 +8,7 @@ from midstation.user.views import user
 from threading import Thread
 from midstation.wechat.views import wechat
 import time
-from midstation.utils.scrape_backend import detect_button_events
+from midstation.utils.scrape_backend_v3 import detect_button_events
 from extensions import login_manager
 from midstation.user.models import User
 from midstation.service.views import service

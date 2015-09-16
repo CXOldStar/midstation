@@ -7,6 +7,7 @@ from midstation.user.models import User
 from midstation.user.models import Button
 from flask_login import login_required, current_user
 from midstation.user.forms import UserInfoForm
+from midstation.button.forms import ButtonForm
 
 user = Blueprint('user', __name__, template_folder='templates')
 
@@ -22,7 +23,9 @@ def button_list():
     except TemplateNotFound:
         abort(404)
 
-@user.route('/button/<node_id>')
+
+#按钮编辑
+@user.route('/button/<node_id>', methods=['GET', 'POST'])
 @login_required
 def button_profile(node_id):
     if node_id == 0:
@@ -32,10 +35,13 @@ def button_profile(node_id):
 
     if not button:
         redirect(url_for('user.button_list'))
+        flash(u'不存在该按钮', category='error')
     try:
-        return render_template('user/button_profile.html', button=button)
+        form = ButtonForm(request.form)
+        return render_template('user/button_profile.html', button=button, form=form)
     except TemplateNotFound:
         abort(404)
+
 
 @user.route('/user_profile', methods=['GET', 'POST'])
 @login_required
@@ -47,8 +53,6 @@ def user_profile():
             flash(u'保存成功', category='success')
     # return render_template('user/test_jquery.html', user=current_user, form=form)
     return render_template('user/user_profile.html', user=current_user, form=form)
-
-
 
 
 def get_buttons(user_id):
