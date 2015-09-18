@@ -12,6 +12,8 @@ from functools import partial
 import time
 import pprint
 
+from string import atoi
+
 gateway_mac = ["000db93db79c", "000db93db700", "000db93db804", "000db93db7c0", "000db93db6f8", "000db93db784"]
 gateway_id = ["a2d790e1-1670-1217-0000-" + mac for mac in gateway_mac]
 
@@ -26,7 +28,7 @@ def main():
     while True:
         i = 0
         try:
-            data = get_received_messages(ORGANIZATION, gateway_id, USERNAME, PASSWORD, 3*60)
+            data = get_received_messages(ORGANIZATION, gateway_id, USERNAME, PASSWORD, 20*60)
             # print(list(enumerate(data)))
             # print(data)
             print_message(data)

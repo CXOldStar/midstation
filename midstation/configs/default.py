@@ -91,6 +91,7 @@ class DefaultConfig(object):
     ADMIN_URL_PREFIX = "/admin"
     WECHAT_URL_PREFIX = "/wechat"
     SERVICE_URL_PREFIX = '/service'
+    CUSTOMER_URL_PREFIX = '/customer'
 
     # Smart Button
     GATEWAY_ID = 'a2d790e1-1670-1217-0000-000db93db700'

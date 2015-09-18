@@ -14,5 +14,8 @@ class Message(db.Model):
         return '<Message %r>' % self.eventUUID
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()

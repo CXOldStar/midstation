@@ -29,8 +29,8 @@ GATEWAY_ID = ["a2d790e1-1670-1217-0000-" + mac for mac in gateway_mac]
 ORGANIZATION = "niot"
 USERNAME = "niot.user"
 PASSWORD = "Ni0t!0715"
-
-NUM_MINUTES_BACK = 1
+NUM_MINUTES_BACK = 2 * 60
+TEMPLATE_ID = 'L2zLySm5W_mlds3SoE4a8EbgcnYnJhZGi3pl6f54eZY'
 
 
 def detect_button_events(interval=5):
@@ -45,27 +45,64 @@ def detect_button_events(interval=5):
 
     try:
         while True:
-            data = get_received_messages(ORGANIZATION, GATEWAY_ID, USERNAME, PASSWORD, 2*60)
+            data = get_received_messages(ORGANIZATION, GATEWAY_ID, USERNAME, PASSWORD, NUM_MINUTES_BACK)
             if data:
                 for event in data:
                     datas = event["events"]
                     for d in event['events']:
                         eventUUID = d['networkMessage']['routerMetadata']['eventUUID']
                         node_id = d['networkMessage']['nodeMetadata']['nodeId']
-                        receipt_time = d['networkMessage']['routerMetadata']['receiptTime']
+                        receipt_time_str = d['networkMessage']['routerMetadata']['receiptTime']
+                        remark = d["networkMessage"]["payloadHex"]
+                        rssi = d["networkMessage"]["signalMetadata"]["rssi"]
+                        event_gateway_id = d['networkMessage']['routerMetadata']['routerUUID']
+
 
                         # change to datatime object
-                        receipt_time = receipt_time[:8] + receipt_time[9:15]
-                        receipt_time = datetime.datetime.strptime(receipt_time, '%Y%m%d%H%M%S')
+                        receipt_time = receipt_time_str[:8] + receipt_time_str[9:15]
+                        receipt_time = datetime.datetime.strptime(receipt_time, '%Y%m%d%H%M%S') + datetime.timedelta(hours=8)
+                        receipt_time_str = receipt_time.strftime('%Y-%m-%d %H:%M:%S')
 
                         # 判断是否已经处理过了
                         msg = Message.query.filter_by(eventUUID=eventUUID).first()
+
                         if not msg:
                             message = Message(eventUUID=eventUUID, node_id=node_id, receipt_time=receipt_time)
                             message.save()
 
                             # 发送微信消息
-                            send_wechat(node_id)
+                            #
+                            wechat_data = {
+                                'first': {
+                                    'value': "恭喜你按下成功！<(￣︶￣)>",
+                                    "color": "#173177"
+                                },
+                                'node_id': {
+                                    'value': node_id,
+                                    'color': '#173177'
+                                },
+                                'receipt_time': {
+                                    'value': receipt_time_str,
+                                    'color': '#173177'
+                                },
+                                'remark': {
+                                    'value': remark,
+                                    'color': '#173177'
+                                },
+                                'rssi': {
+                                    'value': rssi,
+                                    'color': '173177'
+                                },
+                                'gateway_sn': {
+                                    'value': str(gateway_mac.index(event_gateway_id[-12:]) + 1),
+                                    'color': '#173122'
+                                },
+                                'gateway_id': {
+                                    'value': event_gateway_id,
+                                    'color': '#173177'
+                                }
+                            }
+                            send_wechat(node_id, wechat_data)
                             # 创建订单
                             create_order(node_id)
                             # TODO:发送确认消息
@@ -75,22 +112,42 @@ def detect_button_events(interval=5):
 
     except KeyboardInterrupt:
         os.exit()
+    except Exception:
+        detect_button_events()
+
 
 # 发送微信消息
-def send_wechat(node_id):
+def send_wechat(node_id, wechat_data):
     button = Button.query.filter_by(node_id=node_id).first()
     if button:
         wechat_id = button.user.wechat_id
         template_id = button.service.wechat_template_id
 
-    # wechat = WechatBasic(token='midstation', appid='wx6b84ff9cb6f9a54e', appsecret='4e09e5b35198bdbf35b90a65d5f76af4')
     wechat = WechatBasic(token=Config.WECHAT_TOKEN, appid=Config.WECHAT_APPID, appsecret=Config.WECHAT_APPSECRET)
 
-    data = {}
     # res = wechat.send_template_message(user_id=wechat_id,
     #                              template_id=template_id, data=data)
-    res = wechat.send_template_message(user_id='o5lpBuCdBW7HABytpcAbMy3QbBPs',
-                                 template_id='grsshOaPw-0pCrkdZwjOS4Mr4AaQQVteEG-2R_RK6BY', data=data)
+
+    # 我自己
+    chenqitian_wechat_id = get_wechat_id(node_id)
+    chenqitian_wechat_id = chenqitian_wechat_id.strip()
+    if chenqitian_wechat_id:
+
+        res = wechat.send_template_message(user_id=chenqitian_wechat_id,
+                        template_id=TEMPLATE_ID, data=wechat_data, topcolor='#872b6e')
+
+    # 双力
+    res = wechat.send_template_message(user_id='o5lpBuP1mD_xz52gnKXqLpSK5pxc',
+                                 template_id=TEMPLATE_ID, data=wechat_data)
+
+    # # 利安
+    # res = wechat.send_template_message(user_id='o5lpBuAso1p6MUNm4ReIofEWg52s',
+    #                              template_id='kTHQqRY4xsRx5_EIEPmWZcBDySp76AAFKjR-yE0cd9w', data=wechat_data)
+    #
+    # 若溪
+    res = wechat.send_template_message(user_id='o5lpBuFxnOUFIXftM7_e9bc-z1OU',
+                                 template_id=TEMPLATE_ID, data=wechat_data)
+
     if res['errcode']:
         raise Exception('Send wechat message failed')
 
@@ -102,15 +159,18 @@ def send_command(username, password, target_gateway_id, target_node_id, payload_
     The gateway and node ids must be strings
     Returns the command id, or None if the send was unsuccessful
     """
+
     command_url = 'https://ingest.link-labs.com/api/command/Gateway/' + target_gateway_id
     command_headers = {'content-type': 'application/json', 'Accept': 'application/json'}
 
     target_node_id_hex = '{0:x}'.format(target_node_id & int('1' * 36, 2))
     cmd_data = {'commandType': target_node_id_hex + ':' + ('Ack' if needs_ack else 'NoAck'),
                 'payloadHex': payload_hex}
+
     auth = requests.auth.HTTPBasicAuth(username, password)
     response = requests.post(command_url, json.dumps(cmd_data), verify=False,
                              headers=command_headers, auth=auth)
+
     if response.status_code == requests.codes['created']:
         return json.loads(response.text)['commandId']
     else:
@@ -143,5 +203,14 @@ def build_urls(organization, gateway_id, num_minutes_back):
 def get_current_time():
     return datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S.%f')[:-3]
 
+# 返回节点对应的商家的微信id
+def get_wechat_id(node_id):
+    button = Button.query.filter_by(node_id=node_id).first()
+    if button:
+        return button.user.wechat_id
+    else:
+        return ''
+
+
 if __name__ == "__main__":
-    pass
+    print get_wechat_id('25753169220')

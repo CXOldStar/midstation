@@ -1,17 +1,17 @@
-#-*-coding:utf-8
-__author__ = 'qitian'
-
+# -*-coding:utf-8 -*-
 from flask import Flask
 from midstation.auth.views import auth
 from midstation.station.views import station
 from midstation.user.views import user
+from midstation.customer.views import customer
+
 from threading import Thread
 from midstation.wechat.views import wechat
-import time
 from midstation.utils.scrape_backend_v3 import detect_button_events
 from extensions import login_manager
 from midstation.user.models import User
 from midstation.service.views import service
+
 
 def create_app(config=None):
     """Creates the app."""
@@ -41,6 +41,7 @@ def configure_blueprint(app):
     app.register_blueprint(station, url_prefix=app.config['STATION_URL_PREFIX'])
     app.register_blueprint(user, url_prefix=app.config['USER_URL_PREFIX'])
     app.register_blueprint(service, url_prefix=app.config['SERVICE_URL_PREFIX'])
+    app.register_blueprint(customer, url_prefix=app.config['CUSTOMER_URL_PREFIX'])
     # app.register_blueprint(wechat, url_prefix=app.config['WECHAT_URL_PREFIX'])
 
 
@@ -51,6 +52,7 @@ def configure_extensions(app):
 def login_configure(app):
     login_manager.init_app(app)
     login_manager.login_view = app.config['LOGIN_VIEW']
+
     @login_manager.user_loader
     def load_user(user_id):
         user_instance = User.query.filter_by(id=user_id).first()
@@ -63,6 +65,7 @@ def login_configure(app):
 def run_app():
     app = create_app()
     app.run
+
 
 def get_signal():
     pass
