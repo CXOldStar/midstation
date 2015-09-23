@@ -11,6 +11,7 @@ from midstation.utils.scrape_backend_v3 import detect_button_events
 from extensions import login_manager
 from midstation.user.models import User
 from midstation.service.views import service
+from midstation.extensions import csrf
 
 
 def create_app(config=None):
@@ -47,6 +48,9 @@ def configure_blueprint(app):
 
 def configure_extensions(app):
     login_configure(app)
+
+    # Flask-WTF CSRF
+    csrf.init_app(app)
 
 
 def login_configure(app):

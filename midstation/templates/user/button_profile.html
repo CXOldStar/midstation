@@ -28,14 +28,20 @@
                     </div>
                 </div>
 
-
-
-                <div class="right">
+                     <div class="right">
                     <button type="submit" class="btn btn-primary" role="button">保存</button>
                 </div>
             </fieldset>
+            </form>
+            {% if button.node_id: %}
+            <form class="inline-form" method="post" action="{{ url_for('user.delete_button', node_id=button.node_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="btn btn-danger">删除</button>
+             </form>
+            {% endif%}
 
-        </form>
+
+
 
     </div>
 

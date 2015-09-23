@@ -5,7 +5,8 @@ from midstation.extensions import db
 from datetime import datetime
 from midstation.utils.helpers import create_salt
 from hashlib import sha1
-from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import SQLAlchemyError
+
 
 BUTTONS_PER_PAGE = 15
 
@@ -186,7 +187,11 @@ class Button(db.Model):
             self.customer_id = customer.id
         db.session.add(self)
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError, e:
+            db.session.rollback()
+            raise e
         return self
 
     def delete(self):
@@ -195,7 +200,12 @@ class Button(db.Model):
         :return:
         """
         db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError, e:
+            db.session.rollback()
+            raise e
+
 
 
 class Service(db.Model):
@@ -232,7 +242,11 @@ class Service(db.Model):
         if user:
             self.user_id = user.id
         db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+
         return self
 
     def delete(self):
@@ -241,7 +255,10 @@ class Service(db.Model):
         :return:
         """
         db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
 
     def get_services(self, user):
         return user.services
@@ -277,12 +294,16 @@ class Customer(db.Model):
         :return:
         """
         if self.id:
+
             db.session.add(self)
         else:
             if user:
                 self.user_id = user.id
             db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
         return self
 
     def delete(self):
@@ -291,8 +312,10 @@ class Customer(db.Model):
         :return:
         """
         db.session.delete(self)
-        db.session.commit()
-
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -328,7 +351,10 @@ class Order(db.Model):
                 self.create_time = create_time
 
             db.session.add(self)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except SQLAlchemyError:
+                db.session.rollback()
         return self
 
     def delete(self):
@@ -336,7 +362,10 @@ class Order(db.Model):
         :return:
         """
         db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
 
 def create_order(node_id):
     order = Order()
@@ -346,21 +375,7 @@ def create_order(node_id):
 
 
 if __name__ == '__main__':
-    # db.drop_all()
-    # db.create_all()
-    #
-    # user = User('qitian', '2390saf', '1522351', '15874565462')
-    # user.save()
-    #
-    #
-    # user = User.query.filter_by(username='qitian').first()
-    # button = Button(node_id='XDF2142314')
-    # user.buttons.append(button)
-    # user.save()
 
-    # # button.save(user=user)
-
-    # get user buttons
     user = User.query.filter_by(username='qitian').first()
     if user is not None:
         print user.buttons
@@ -402,26 +417,3 @@ if __name__ == '__main__':
     order = Order.query.filter_by(button_id=Button.query.filter_by(node_id='890087').first().id).first()
     print 'order service: ', order.service.name
 
-
-
-    # customer.delete()
-    # customer = Customer(addr=u'南横村59号222房')
-    # customer.save(user=user)
-
-    # add buttons
-    # button = Button(node_id='111111')
-    # user = User.query.filter_by(username='qitian').first()
-    # if user is not None:
-    #     button.save(user)
-    # #
-    # #
-    # button = Button.query.filter_by(node_id='123456').first()
-    # print button.user
-
-
-
-    # user.delete()
-    # service = Service('hello')
-    # button = Button('ffdds189380')
-    # customer = Customer('南横村')
-    # button.save(user=user, service=service, customer=customer)

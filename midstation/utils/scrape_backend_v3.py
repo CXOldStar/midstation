@@ -29,7 +29,7 @@ GATEWAY_ID = ["a2d790e1-1670-1217-0000-" + mac for mac in gateway_mac]
 ORGANIZATION = "niot"
 USERNAME = "niot.user"
 PASSWORD = "Ni0t!0715"
-NUM_MINUTES_BACK = 2 * 60
+NUM_MINUTES_BACK = 1
 TEMPLATE_ID = 'L2zLySm5W_mlds3SoE4a8EbgcnYnJhZGi3pl6f54eZY'
 
 
@@ -103,15 +103,13 @@ def detect_button_events(interval=5):
                                 }
                             }
                             send_wechat(node_id, wechat_data)
-                            # 创建订单
+                            # 创建订单username
                             create_order(node_id)
                             # TODO:发送确认消息
                             # send_command(USERNAME, PASSWORD, GATEWAY_ID, node_id, '0XFF')
 
             time.sleep(interval)
 
-    except KeyboardInterrupt:
-        os.exit()
     except Exception:
         detect_button_events()
 
@@ -121,32 +119,18 @@ def send_wechat(node_id, wechat_data):
     button = Button.query.filter_by(node_id=node_id).first()
     if button:
         wechat_id = button.user.wechat_id
-        template_id = button.service.wechat_template_id
 
-    wechat = WechatBasic(token=Config.WECHAT_TOKEN, appid=Config.WECHAT_APPID, appsecret=Config.WECHAT_APPSECRET)
+    if wechat_id:
+        wechat_id = wechat_id.strip()
+        wechat = WechatBasic(token=Config.WECHAT_TOKEN, appid=Config.WECHAT_APPID, appsecret=Config.WECHAT_APPSECRET)
 
-    # res = wechat.send_template_message(user_id=wechat_id,
-    #                              template_id=template_id, data=data)
+        res = wechat.send_template_message(user_id=wechat_id,
+                                           template_id=TEMPLATE_ID, data=wechat_data, topcolor='#872b6e')
 
-    # 我自己
-    chenqitian_wechat_id = get_wechat_id(node_id)
-    chenqitian_wechat_id = chenqitian_wechat_id.strip()
-    if chenqitian_wechat_id:
-
-        res = wechat.send_template_message(user_id=chenqitian_wechat_id,
-                        template_id=TEMPLATE_ID, data=wechat_data, topcolor='#872b6e')
-
-    # 双力
-    res = wechat.send_template_message(user_id='o5lpBuP1mD_xz52gnKXqLpSK5pxc',
+    # # 我
+    res = wechat.send_template_message(user_id='o5lpBuCdBW7HABytpcAbMy3QbBPs',
                                  template_id=TEMPLATE_ID, data=wechat_data)
 
-    # # 利安
-    # res = wechat.send_template_message(user_id='o5lpBuAso1p6MUNm4ReIofEWg52s',
-    #                              template_id='kTHQqRY4xsRx5_EIEPmWZcBDySp76AAFKjR-yE0cd9w', data=wechat_data)
-    #
-    # 若溪
-    res = wechat.send_template_message(user_id='o5lpBuFxnOUFIXftM7_e9bc-z1OU',
-                                 template_id=TEMPLATE_ID, data=wechat_data)
 
     if res['errcode']:
         raise Exception('Send wechat message failed')
@@ -177,7 +161,6 @@ def send_command(username, password, target_gateway_id, target_node_id, payload_
         raise RuntimeError(response.reason)
 
 
-
 def get_received_messages(organization, gateway_id, username, password, num_minutes_back):
     urls = build_urls(organization, gateway_id, num_minutes_back)
     auth = requests.auth.HTTPBasicAuth(username, password)
@@ -196,12 +179,13 @@ def get_received_messages(organization, gateway_id, username, password, num_minu
 def build_urls(organization, gateway_id, num_minutes_back):
     url_base = 'https://dataaccess.link-labs.com/data/dataFlow/' + organization + '/gateway/'
     curr_time = get_current_time()
-    return [(url_base + ident + '/events/timeRange?refTime=' +\
+    return [(url_base + ident + '/events/timeRange?refTime=' +
         curr_time + '&minsBack=' + str(num_minutes_back)) for ident in gateway_id]
 
 
 def get_current_time():
     return datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S.%f')[:-3]
+
 
 # 返回节点对应的商家的微信id
 def get_wechat_id(node_id):

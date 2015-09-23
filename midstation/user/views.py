@@ -10,6 +10,8 @@ from midstation.user.forms import UserInfoForm
 from midstation.button.forms import ButtonForm
 from midstation.user.models import Service, Customer
 from midstation.utils.tools import get_service_choice, get_customer_choice
+from midstation.extensions import db
+from sqlalchemy.exc import IntegrityError
 
 user = Blueprint('user', __name__, template_folder='templates')
 
@@ -43,15 +45,16 @@ def button_profile(node_id):
             form.service.choices = get_service_choice()
             form.customer.choices = get_customer_choice()
 
-
             if request.method == 'POST' and form.validate_on_submit():
-                print form.service.data
-                print form.customer.data
+                exit_button = Button.query.filter(db.and_(Button.user_id==current_user.id, Button.node_id==form.node_id.data)).first()
+                if exit_button:
+                    flash(u'node_id 已经存在', 'warning')
+                    return redirect(url_for('user.button_profile', node_id=node_id))
+
                 form.save_form(button)
                 return redirect(url_for('user.button_list'))
 
-
-        return render_template('user/button_profile.html',button=button, form=form)
+        return render_template('user/button_profile.html', button=button, form=form)
     except TemplateNotFound:
         abort(404)
 
@@ -64,8 +67,25 @@ def user_profile():
         if form.validate_on_submit():
             form.save_form()
             flash(u'保存成功', category='success')
-    # return render_template('user/test_jquery.html', user=current_user, form=form)
+
     return render_template('user/user_profile.html',  form=form)
+
+
+@user.route('/button/<node_id>/delete', methods=['POST'])
+@login_required
+def delete_button(node_id):
+    button = Button.query.filter_by(node_id=node_id).first()
+    if button is None:
+        flash(u'不存在改按钮', category='danger')
+
+    try:
+        button.delete()
+    except IntegrityError:
+        flash(u'删除失败，存在引用到该按键的记录', 'danger')
+    except Exception:
+        flash(u'删除失败', category='danger')
+
+    return redirect(url_for('user.button_list'))
 
 
 def get_buttons(user_id):
