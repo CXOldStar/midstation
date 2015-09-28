@@ -29,7 +29,7 @@ GATEWAY_ID = ["a2d790e1-1670-1217-0000-" + mac for mac in gateway_mac]
 ORGANIZATION = "niot"
 USERNAME = "niot.user"
 PASSWORD = "Ni0t!0715"
-NUM_MINUTES_BACK = 1
+NUM_MINUTES_BACK = 5
 TEMPLATE_ID = 'L2zLySm5W_mlds3SoE4a8EbgcnYnJhZGi3pl6f54eZY'
 
 
@@ -48,7 +48,6 @@ def detect_button_events(interval=5):
             data = get_received_messages(ORGANIZATION, GATEWAY_ID, USERNAME, PASSWORD, NUM_MINUTES_BACK)
             if data:
                 for event in data:
-                    datas = event["events"]
                     for d in event['events']:
                         eventUUID = d['networkMessage']['routerMetadata']['eventUUID']
                         node_id = d['networkMessage']['nodeMetadata']['nodeId']
@@ -56,7 +55,6 @@ def detect_button_events(interval=5):
                         remark = d["networkMessage"]["payloadHex"]
                         rssi = d["networkMessage"]["signalMetadata"]["rssi"]
                         event_gateway_id = d['networkMessage']['routerMetadata']['routerUUID']
-
 
                         # change to datatime object
                         receipt_time = receipt_time_str[:8] + receipt_time_str[9:15]

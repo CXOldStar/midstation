@@ -125,9 +125,9 @@ class User(db.Model):
         db.session.add(self)
         try:
             db.session.commit()
-        except:
+        except Exception, e:
             db.session.rollback()
-            raise
+            raise e
 
         return self
 
@@ -137,7 +137,11 @@ class User(db.Model):
         :return:
         """
         db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception, e:
+            db.session.rollback()
+            raise e
 
     @classmethod
     def get_user_by_id(self, user_id):

@@ -11,16 +11,17 @@ from midstation.utils.scrape_backend_v3 import detect_button_events
 from extensions import login_manager
 from midstation.user.models import User
 from midstation.service.views import service
-from midstation.extensions import csrf
+from midstation.extensions import csrf, redis_store
 
 
 def create_app(config=None):
     """Creates the app."""
 
     # 探测按钮消息后台线程
-    t = Thread(target=detect_button_events)
-    t.setDaemon(True)
-    t.start()
+    # t = Thread(target=detect_button_events)
+    # t.setDaemon(True)
+    # t.start()
+    print u'本地开发，没有开通微信消息处理，已在服务器上开通'
 
     # Initialize the app
     app = Flask(__name__)
@@ -48,9 +49,10 @@ def configure_blueprint(app):
 
 def configure_extensions(app):
     login_configure(app)
-
     # Flask-WTF CSRF
     csrf.init_app(app)
+    # redis
+    redis_store.init_app(app)
 
 
 def login_configure(app):
@@ -64,11 +66,6 @@ def login_configure(app):
             return user_instance
         else:
             return None
-
-
-def run_app():
-    app = create_app()
-    app.run
 
 
 def get_signal():

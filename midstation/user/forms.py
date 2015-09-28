@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 __author__ = 'qitian'
 from flask_wtf import Form
+from flask import flash
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from midstation.user.models import User
 from flask_login import current_user
+from midstation.extensions import redis_store
+from redis import Redis
 
 class UserInfoForm(Form):
     username = StringField(u'用户名', validators=[DataRequired()])
@@ -20,3 +23,17 @@ class UserInfoForm(Form):
 
         current_user.save()
 
+class AuthWechatForm(Form):
+    auth_key = StringField(u'微信验证码', validators=[DataRequired()])
+    submit = SubmitField(u'验证')
+
+    def save_wechat_id(self):
+        # 验证验证码是否存在
+        redis = Redis()
+
+
+        if redis_store.exists(self.auth_key.data):
+            current_user.wechat_id = redis_store.get(self.auth_key.data)
+            current_user.save()
+        else:
+            flash(u'验证码错误', 'danger')

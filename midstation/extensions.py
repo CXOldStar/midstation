@@ -16,7 +16,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_cache import Cache
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_redis import Redis
+from flask_redis import FlaskRedis
 from flask_migrate import Migrate
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
@@ -42,7 +42,7 @@ mail = Mail()
 cache = Cache()
 
 # Redis
-redis_store = Redis()
+redis_store = FlaskRedis()
 
 # Debugtoolbar
 debugtoolbar = DebugToolbarExtension()

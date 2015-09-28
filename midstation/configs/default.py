@@ -81,7 +81,7 @@ class DefaultConfig(object):
 
     # Flask-Redis
     REDIS_ENABLED = False
-    REDIS_URL = "redis://:password@localhost:6379"
+    REDIS_URL = "redis://:123456@183.230.40.230:6379"
     REDIS_DATABASE = 0
 
     # URL Prefixes
@@ -103,11 +103,12 @@ class DefaultConfig(object):
     WECHAT_TOKEN = 'midstation'
     WECHAT_APPID = 'wx6b84ff9cb6f9a54e'
     WECHAT_APPSECRET = '4e09e5b35198bdbf35b90a65d5f76af4'
-
+    AUTH_KEY_EXPIRE = 300           # 微信验证码过去时间（min）
     # Auth
     LOGIN_VIEW = "auth.login"
-
 
     # Protection against form post fraud
     WTF_CSRF_ENABLED = True
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
+
+

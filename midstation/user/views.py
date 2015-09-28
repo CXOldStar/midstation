@@ -6,7 +6,7 @@ from jinja2 import TemplateNotFound
 from midstation.user.models import User
 from midstation.user.models import Button
 from flask_login import login_required, current_user
-from midstation.user.forms import UserInfoForm
+from midstation.user.forms import UserInfoForm, AuthWechatForm
 from midstation.button.forms import ButtonForm
 from midstation.user.models import Service, Customer
 from midstation.utils.tools import get_service_choice, get_customer_choice
@@ -63,12 +63,17 @@ def button_profile(node_id):
 @login_required
 def user_profile():
     form = UserInfoForm(request.form)
+    auth_form = AuthWechatForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
             form.save_form()
             flash(u'保存成功', category='success')
 
-    return render_template('user/user_profile.html',  form=form)
+        if auth_form.validate_on_submit():
+            auth_form.save_wechat_id()
+            flash(u'验证成功', category='success')
+
+    return render_template('user/user_profile.html',  form=form,auth_form=auth_form)
 
 
 @user.route('/button/<node_id>/delete', methods=['POST'])

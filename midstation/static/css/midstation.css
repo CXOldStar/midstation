@@ -510,3 +510,14 @@ input {
 .center {text-align: center ! important;}
 .right {text-align: right ! important;}
 
+
+.auth-wechat {
+    margin-top: 30px;
+}
+.auth-wechat .auth-header {
+    height: 50px;
+    border-radius: 0;
+    margin-bottom: 14px;
+    font-size: large;
+
+}
