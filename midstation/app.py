@@ -9,9 +9,11 @@ from threading import Thread
 from midstation.wechat.views import wechat
 from midstation.utils.scrape_backend_v3 import detect_button_events
 from extensions import login_manager
-from midstation.user.models import User
+from midstation.user.models import User, Button
 from midstation.service.views import service
-from midstation.extensions import csrf, redis_store
+from midstation.extensions import csrf, redis_store, admin, db
+from flask_admin.contrib.sqla import ModelView
+from wtforms.fields import SelectField
 
 
 def create_app(config=None):
@@ -47,12 +49,34 @@ def configure_blueprint(app):
     # app.register_blueprint(wechat, url_prefix=app.config['WECHAT_URL_PREFIX'])
 
 
+class MyView(ModelView):
+    can_create = False
+    column_list = ['username', 'telephone']
+    form_overrides = dict(status=SelectField)
+    form_args = dict(
+        # Pass the choices to the `SelectField`
+        status=dict(
+            choices=[(0, 'waiting'), (1, 'in_progress'), (2, 'finished')]
+        ))
+
+    def __init__(self, session, **kwargs):
+        super(MyView, self).__init__(User, session, endpoint='users', **kwargs)
+
+
 def configure_extensions(app):
     login_configure(app)
     # Flask-WTF CSRF
     csrf.init_app(app)
     # redis
     redis_store.init_app(app)
+
+    # Admin
+    admin.init_app(app)
+    admin.template_mode = 'bootstrap3'
+    admin.add_view(MyView(db.session))
+
+
+
 
 
 def login_configure(app):
@@ -74,4 +98,7 @@ def get_signal():
 if __name__ == '__main__':
     app = create_app()
     app.debug = True
-    app.run()
+    user = User.query.filter_by(id=5).first()
+    print user
+
+    # app.run()
