@@ -521,3 +521,15 @@ input {
     font-size: large;
 
 }
+
+.pagination-page-info {
+    padding-left: 0;
+    width: 40em;
+    font-size: 12px;
+}
+.pagination-page-info b {
+    color: black;
+    background: #6aa6ed;
+    font-size: 150%;
+}
+

@@ -14,7 +14,7 @@ from midstation.service.views import service
 from midstation.extensions import csrf, redis_store, admin, db
 from flask_admin.contrib.sqla import ModelView
 from wtforms.fields import SelectField
-
+from midstation.order.views import order
 
 def create_app(config=None):
     """Creates the app."""
@@ -46,6 +46,7 @@ def configure_blueprint(app):
     app.register_blueprint(user, url_prefix=app.config['USER_URL_PREFIX'])
     app.register_blueprint(service, url_prefix=app.config['SERVICE_URL_PREFIX'])
     app.register_blueprint(customer, url_prefix=app.config['CUSTOMER_URL_PREFIX'])
+    app.register_blueprint(order, url_prefix=app.config['ORDER_URL_PREFIX'])
     # app.register_blueprint(wechat, url_prefix=app.config['WECHAT_URL_PREFIX'])
 
 
@@ -64,6 +65,8 @@ class MyView(ModelView):
 
 
 def configure_extensions(app):
+
+    db.init_app(app)
     login_configure(app)
     # Flask-WTF CSRF
     csrf.init_app(app)
@@ -94,7 +97,7 @@ def login_configure(app):
 
 def get_signal():
     pass
-
+ 
 if __name__ == '__main__':
     app = create_app()
     app.debug = True

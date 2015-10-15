@@ -8,7 +8,7 @@ from midstation.button.models import Message
 from midstation.user.models import User, Button
 import json
 from wechat_sdk import WechatBasic
-from midstation.user.models import Order, create_order
+from midstation.order.models import Order, create_order
 import requests
 
 requests.packages.urllib3.disable_warnings()
@@ -18,6 +18,7 @@ ORGANIZATION = Config.ORGANIZATION
 USERNAME = Config.LINKLAB_USERNAME
 PASSWORD = Config.LINKLAB_PASSWORD
 NUM_MINUTES_BACK = 1
+
 
 def detect_button_events(interval=5):
     """

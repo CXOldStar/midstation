@@ -82,8 +82,6 @@ def wechat_token():
             else:
                 response = wechat.response_text(u'未知')
 
-            print message.content
-            print message.source
             return response
 
     return 'auth token fail'

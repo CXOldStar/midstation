@@ -18,7 +18,7 @@
         <li><a href="/user/button_list">按钮</a></li>
         <li><a href="{{ url_for('service.service_list') }}">服务</a></li>
         <li><a href="{{ url_for('customer.customer_list' )}}">客户</a></li>
-        <li><a href="#">订单</a></li>
+        <li><a href="{{ url_for('order.order_list')}}">订单</a></li>
       </ul>
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">

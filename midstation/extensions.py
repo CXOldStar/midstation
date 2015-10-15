@@ -27,11 +27,11 @@ from flask_admin import Admin
 from flask import Flask
 import os
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.dirname(os.path.dirname(__file__)) + '/' + \
-                            'test.sqlite'
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.dirname(os.path.dirname(__file__)) + '/' + \
+#                             'test.sqlite'
 # Database
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 # Login
 login_manager = LoginManager()

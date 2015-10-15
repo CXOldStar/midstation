@@ -19,7 +19,7 @@ from midstation.button.models import Message
 from midstation.user.models import User, Button
 import json
 from wechat_sdk import WechatBasic
-from midstation.user.models import Order, create_order
+from midstation.order.models import Order, create_order
 import requests
 
 
@@ -125,7 +125,7 @@ def send_wechat(node_id, wechat_data):
         res = wechat.send_template_message(user_id=wechat_id,
                                            template_id=TEMPLATE_ID, data=wechat_data, topcolor='#872b6e')
 
-    # # 我
+    #  我
     res = wechat.send_template_message(user_id='o5lpBuCdBW7HABytpcAbMy3QbBPs',
                                  template_id=TEMPLATE_ID, data=wechat_data)
 

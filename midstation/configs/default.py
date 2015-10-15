@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.configs.default
+    midstation.configs.default
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     This is the default configuration for FlaskBB that every site should have.
@@ -35,7 +35,7 @@ class DefaultConfig(object):
 
     # Default Database
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
-                              'midstation.sqlite'
+                              'test.sqlite'
 
     # This will print all SQL statements
     SQLALCHEMY_ECHO = True
@@ -92,6 +92,7 @@ class DefaultConfig(object):
     WECHAT_URL_PREFIX = "/wechat"
     SERVICE_URL_PREFIX = '/service'
     CUSTOMER_URL_PREFIX = '/customer'
+    ORDER_URL_PREFIX = '/order'
 
     # Smart Button
     GATEWAY_ID = 'a2d790e1-1670-1217-0000-000db93db700'

@@ -42,6 +42,7 @@ class User(db.Model):
     # One-to-many
     orders = db.relationship('Order',
                              backref='user',
+                             lazy='dynamic',
                              primaryjoin='Order.user_id == User.id',
                              cascade='all, delete-orphan'
                              )
@@ -161,8 +162,8 @@ class Button(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     node_id = db.Column(db.String(50), nullable=False, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    service_id = db.Column(db.Integer, db.ForeignKey('services.id'))
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'))
+    service_id = db.Column(db.Integer, db.ForeignKey('services.id'))
 
     orders = db.relationship('Order',
                              primaryjoin="Order.button_id == Button.id"
@@ -321,62 +322,6 @@ class Customer(db.Model):
         except SQLAlchemyError:
             db.session.rollback()
 
-class Order(db.Model):
-    __tablename__ = 'orders'
-    id = db.Column(db.Integer, primary_key=True)
-    button_id = db.Column(db.Integer, db.ForeignKey('buttons.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    service_id = db.Column(db.Integer, db.ForeignKey('services.id'), nullable=False)
-    create_time = db.Column(db.DateTime, default=datetime.utcnow())
-    solved = db.Column(db.Boolean, default=False)
-
-
-    def __repr__(self):
-        """Set to a unique key specific to the object in the database.
-        Required for cache.memoize() to work across requests.
-        """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
-
-    def save(self, button=None, create_time=None):
-        """
-        Saves an order and return an order object
-        :param button:
-        :param user:
-        :return: Order object
-        """
-        if self.id:
-            db.session.add(self)
-            db.session.commit()
-        elif button:
-            self.button_id = button.id
-            self.user_id = button.user.id
-            self.service_id = button.service.id
-            if create_time:
-                self.create_time = create_time
-
-            db.session.add(self)
-            try:
-                db.session.commit()
-            except SQLAlchemyError:
-                db.session.rollback()
-        return self
-
-    def delete(self):
-        """
-        :return:
-        """
-        db.session.delete(self)
-        try:
-            db.session.commit()
-        except SQLAlchemyError:
-            db.session.rollback()
-
-def create_order(node_id):
-    order = Order()
-    button = Button.query.filter_by(node_id=node_id).first()
-
-    order.save(button=button)
-
 
 if __name__ == '__main__':
 
@@ -411,13 +356,13 @@ if __name__ == '__main__':
     print customer.buttons[1].service.name
 
     # create an order by node id
-    def create_order(node_id):
-        order = Order()
-        button = Button.query.filter_by(node_id=node_id).first()
-        service = button.service
-
-        order.save(button=button)
-
-    order = Order.query.filter_by(button_id=Button.query.filter_by(node_id='890087').first().id).first()
-    print 'order service: ', order.service.name
+    # def create_order(node_id):
+    #     order = Order()
+    #     button = Button.query.filter_by(node_id=node_id).first()
+    #     service = button.service
+    #
+    #     order.save(button=button)
+    #
+    # order = Order.query.filter_by(button_id=Button.query.filter_by(node_id='890087').first().id).first()
+    # print 'order service: ', order.service.name
 
