@@ -6,7 +6,7 @@ from datetime import datetime
 from midstation.utils.helpers import create_salt
 from hashlib import sha1
 from sqlalchemy.exc import SQLAlchemyError
-
+from sqlalchemy.exc import IntegrityError
 
 BUTTONS_PER_PAGE = 15
 
@@ -238,6 +238,11 @@ class Service(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
+    @classmethod
+    def get(cls, id):
+        id = int(id)
+        return cls.query.filter_by(id=id).first()
+
     def save(self, user=None):
         """
 
@@ -262,8 +267,9 @@ class Service(db.Model):
         db.session.delete(self)
         try:
             db.session.commit()
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
             db.session.rollback()
+            raise
 
     def get_services(self, user):
         return user.services
@@ -280,7 +286,7 @@ class Customer(db.Model):
     wechat_id = db.Column(db.String(50))
 
     # One-to-many
-    buttons = db.relationship('Button', primaryjoin='Button.customer_id == Customer.id')
+    buttons = db.relationship('Button', backref='customer', primaryjoin='Button.customer_id == Customer.id')
 
 
     def __init__(self, addr=None):
@@ -291,6 +297,11 @@ class Customer(db.Model):
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
+
+    @classmethod
+    def get(cls, id):
+        id = int(id)
+        return cls.query.filter_by(id=id).first()
 
     def save(self, user=None):
         """
@@ -316,11 +327,15 @@ class Customer(db.Model):
 
         :return:
         """
+        if Button.query.filter_by(customer_id=self.id).first():
+            raise IntegrityError
+
         db.session.delete(self)
         try:
             db.session.commit()
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
             db.session.rollback()
+            raise e
 
 
 if __name__ == '__main__':

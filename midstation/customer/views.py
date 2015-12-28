@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 __author__ = 'qitian'
-
 from flask import Blueprint, redirect, request, url_for, render_template, abort, flash
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from midstation.user.models import User, Service, Customer
 from midstation.customer.forms import CustomerProfileForm
+from sqlalchemy.exc import IntegrityError
 
 
 customer = Blueprint('customer', __name__, template_folder='templates')
@@ -45,3 +45,21 @@ def customer_profile(customer_id):
     customers = current_user.customers
 
     return render_template('customer/customer_profile.html', form=form, customer=cust)
+
+
+@customer.route('/customer/<id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_customer(id):
+    customer = Customer.get(id)
+    if customer is None:
+        flash(u'不存在该客人', category='danger')
+        return redirect(url_for('customer.customer_list'))
+
+    try:
+        customer.delete()
+    except IntegrityError:
+        flash(u'删除失败，存在引用到该服务的记录', 'danger')
+    except Exception:
+        flash(u'删除失败', category='danger')
+
+    return redirect(url_for('customer.customer_list'))

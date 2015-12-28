@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
     
-    <h1>Buttons</h1>
+    <h3>Buttons</h3>
     <div class="table-responsive">
         <table class="table table-hover">
         <thead>
@@ -17,8 +17,8 @@
         <tr>
             <td><a href="{{ url_for('user.button_profile', node_id=button.node_id) }}">{{ button.node_id }}</a></td>
             <td>{{ button.service.name }}</td>
-            <td>中文</td>
-            <td></td>
+            <td>{{ button.customer.name }}</td>
+            <td>{{ button.customer.addr }}</td>
         </tr>
         {% endfor %}
     </tbody>

@@ -33,7 +33,7 @@
                 </div>
             </fieldset>
             </form>
-            {% if button.node_id: %}
+            {% if button.node_id %}
             <form class="inline-form" method="post" action="{{ url_for('user.delete_button', node_id=button.node_id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button class="btn btn-danger">删除</button>

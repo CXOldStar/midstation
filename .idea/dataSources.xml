@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="327923451">
-    <data-source source="LOCAL" name="SQLite -Test" uuid="52bd68f3-e49b-4640-80e2-0f2c6cceb93d">
+  <component name="DataSourceManagerImpl" format="xml" hash="2053264917">
+    <data-source source="LOCAL" name="Sqlite (Xerial) - test.sqlite" uuid="d969c807-7feb-421f-aa2a-fc0f234fa71c">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/test.sqlite</jdbc-url>
-      <libraries />
-    </data-source>
-    <data-source source="LOCAL" name="SQLite -hello" uuid="433bfd6a-c9c7-4e2c-8989-09a6921ece4a">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:J:\PycharmProjects\midstation\hello.sqlite</jdbc-url>
-      <libraries />
     </data-source>
   </component>
 </project>

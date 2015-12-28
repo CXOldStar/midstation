@@ -41,6 +41,12 @@
                 </fieldset>
 
             </form>
+            {% if customer.id %}
+            <form class="inline-form" method="post"action="{{ url_for('customer.delete_customer', id=customer.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="btn btn-danger">删除</button>
+             </form>
+            {% endif%}
 
         </div>
 
