@@ -36,4 +36,4 @@ WTForms==2.0.2
 https://github.com/sh4nks/flask-babelex/tarball/master#egg=Flask-BabelEx
 https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-Whooshalchemy
 wechat-sdk
-Flask-Pagination=0.4.1
+Flask-Pagination

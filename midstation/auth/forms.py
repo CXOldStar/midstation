@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-    flaskbb.auth.forms
-    ~~~~~~~~~~~~~~~~~~~~
 
-    It provides the forms that are needed for the auth views.
-
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
-"""
 from datetime import datetime
 
 from flask_wtf import Form, RecaptchaField
@@ -50,12 +42,6 @@ class RegisterForm(Form):
 
     submit = SubmitField(u'注册')
 
-    # def validate_username(self):
-    #     user = User.query.filter_by(username=self.username.data).first()
-    #     if user:
-    #         return False
-    #         # raise ValidationError(u'该用户名已使用')
-    #     return True
 
     def save(self):
 
