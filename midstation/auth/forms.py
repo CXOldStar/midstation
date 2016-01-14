@@ -19,7 +19,7 @@ class LoginForm(Form):
     password = PasswordField(u'密码', [Length(min=6, max=25)])
     remember_me = BooleanField(u'记住我', default=False)
 
-    submit = SubmitField(u'登陆')
+    submit = SubmitField(u'登 录')
 
     def auth(self):
         users = User.query.filter_by(username=self.username.data).all()

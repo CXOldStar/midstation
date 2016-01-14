@@ -46,10 +46,11 @@ def button_profile(node_id):
             form.customer.choices = get_customer_choice()
 
             if request.method == 'POST' and form.validate_on_submit():
-                exit_button = Button.query.filter(db.and_(Button.user_id==current_user.id, Button.node_id==form.node_id.data)).first()
-                if exit_button:
-                    flash(u'node_id 已经存在', 'warning')
-                    return redirect(url_for('user.button_profile', node_id=node_id))
+                if node_id == '0':
+                    exit_button = Button.query.filter(db.and_(Button.user_id==current_user.id, Button.node_id==form.node_id.data)).first()
+                    if exit_button:
+                        flash(u'node_id 已经存在', 'warning')
+                        return redirect(url_for('user.button_profile', node_id=node_id))
 
                 form.save_form(button)
                 return redirect(url_for('user.button_list'))

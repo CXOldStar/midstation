@@ -15,7 +15,7 @@
 		<form action="" method="POST">
 
             {{ form.csrf_token }}
-			<h1>Login Form</h1>
+			<h1>Register Form</h1>
 			<div>
 				{{ form.username(placeholder=form.username.label.text) }}
 			</div>
@@ -27,7 +27,7 @@
 			</div>
 			<div>
 				{{ form.submit(placeholder=form.submit.label.text) }}
-				<a href="{{ url_for('auth.login') }}">登陆</a>
+				<a href="{{ url_for('auth.login') }}">登 录</a>
 			</div>
 		</form><!-- form -->
 	</section><!-- content -->
